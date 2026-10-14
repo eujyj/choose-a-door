@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Choose a Door</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px;
+      color: #f5f3ff; background: radial-gradient(ellipse at top, #34245d 0, #17132d 48%, #0d1020 100%);
+    }
+    main { width: min(100%, 620px); padding: clamp(24px, 6vw, 48px); border: 1px solid #ffffff24;
+      border-radius: 28px; background: #17182be8; box-shadow: 0 24px 80px #0007; text-align: center; }
+    .eyebrow { color: #c4b5fd; text-transform: uppercase; letter-spacing: .16em; font-size: .75rem; font-weight: 700; }
+    h1 { margin: 12px 0; font-size: clamp(2rem, 8vw, 3.3rem); }
+    #story { min-height: 72px; color: #d9d7e8; line-height: 1.65; font-size: 1.1rem; }
+    #choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 24px; }
+    button { border: 1px solid #a78bfa; border-radius: 14px; padding: 12px 20px; background: #7c3aed;
+      color: white; font: inherit; font-weight: 700; cursor: pointer; transition: transform .15s, background .15s; }
+    button:hover { background: #8b5cf6; transform: translateY(-2px); }
+    button:focus-visible { outline: 3px solid #f0abfc; outline-offset: 3px; }
+    button.secondary { background: #292640; border-color: #5b5678; }
+    #result { min-height: 32px; margin-top: 22px; color: #fde68a; font-weight: 700; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <main aria-live="polite">
+    <div class="eyebrow">A tiny adventure</div>
+    <h1>Choose a Door</h1>
+    <p id="story">You stand in front of two doors. Which one will you choose?</p>
+    <div id="choices">
+      <button data-choice="left">🚪 Left door</button>
+      <button data-choice="right">🚪 Right door</button>
+    </div>
+    <p id="result" role="status"></p>
+    <button id="restart" class="secondary hidden">Start again</button>
+  </main>
+  <script>
+    const story = document.querySelector("#story");
+    const choices = document.querySelector("#choices");
+    const result = document.querySelector("#result");
+    const restart = document.querySelector("#restart");
+
+    function showChoices(options) {
+      choices.replaceChildren(...options.map(({ text, value }) => {
+        const button = document.createElement("button");
+        button.textContent = text;
+        button.dataset.choice = value;
+        return button;
+      }));
+    }
+
+    function finish(message) {
+      result.textContent = message;
+      choices.replaceChildren();
+      restart.classList.remove("hidden");
+    }
+
+    choices.addEventListener("click", (event) => {
+      const choice = event.target.closest("button")?.dataset.choice;
+      if (!choice) return;
+
+      if (choice === "left") {
+        story.textContent = "There are two boxes: one red and one blue. Which one do you choose?";
+        showChoices([{ text: "🟥 Red box", value: "red" }, { text: "🟦 Blue box", value: "blue" }]);
+      } else if (choice === "right") {
+        story.textContent = "You find a smartphone with a game called Genshin Impact. Do you choose to play it?";
+        showChoices([{ text: "Yes, play", value: "yes" }, { text: "No", value: "no" }]);
+      } else if (choice === "red") {
+        finish("You get many gold coins! 🪙");
+      } else if (choice === "blue") {
+        finish("You get many Primogems! ✨");
+      } else if (choice === "yes") {
+        finish("You are happy and start playing Genshin Impact! 🎮");
+      } else if (choice === "no") {
+        finish("You find that you are attracted to it. Finally, you start playing it! 🎮");
+      }
+    });
+
+    restart.addEventListener("click", () => {
+      story.textContent = "You stand in front of two doors. Which one will you choose?";
+      result.textContent = "";
+      restart.classList.add("hidden");
+      showChoices([{ text: "🚪 Left door", value: "left" }, { text: "🚪 Right door", value: "right" }]);
+    });
+  </script>
+</body>
+</html>
